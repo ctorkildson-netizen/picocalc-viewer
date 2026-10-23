@@ -1,0 +1,22 @@
+Sample pictures for the PicoCalc Picture Viewer
+
+black-hole.jpg  Computer simulation of a supermassive black hole at the
+                core of a galaxy, bending the light of the stars behind
+                it (NASA/ESA Hubble release, 6 April 2016).
+                Simulation: NASA, ESA, and D. Coe, J. Anderson, and
+                R. van der Marel (Space Telescope Science Institute).
+                Background stars: Omega Centauri image by NASA, ESA,
+                and the Hubble SM4 ERO Team.
+                Source: https://science.nasa.gov/asset/hubble/black-hole-in-ngc-1600/
+                Baseline JPEG, 640x633.
+
+cooper.bmp      Cooper, a Cardigan Welsh Corgi.
+                Photo by Chris Torkildson.  24-bit BMP, 320x240.
+
+pottery.png     Pottery at an art show in San Francisco.
+                Photo by Chris Torkildson.  PNG, 640x480.
+
+sycamores.jpg   Pollarded sycamores by the War Memorial, San Francisco
+                Civic Center.  Photo by Chris Torkildson.
+                Stored on its side with an EXIF orientation tag, so the
+                viewer turns it upright by itself.  JPEG, 640x480.

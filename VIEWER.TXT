@@ -1,0 +1,152 @@
+Picture Viewer -- pictures and slide shows on the PicoCalc
+=========================================================
+
+Test build. Needs a PicoCalc with a Pico 2 W (RP2350W), UF2
+Loader 2.3 or later, and Blair Leduc's PicoCalc Shell installed
+as /BOOT2350.UF2 (the viewer returns to it). A plain Pico 2
+should work too, but hasn't been tried.
+
+Shows JPEG, PNG and BMP pictures from the SD card, fitted to the
+screen, with a preview of each one in the list. Steps through a
+folder, rotates pictures, brightens dark ones, and runs slide
+shows -- leave one running and the PicoCalc is a picture frame.
+
+
+INSTALL
+-------
+1. Copy viewer.uf2 into the pico2-apps folder.
+2. Put pictures in a folder called /pictures. The viewer starts
+   there, unless the settings name another folder (without one,
+   it starts at the top of the card). Folders inside it are
+   fine; the samples folder is a good first one.
+3. Settings, if you want any: copy viewer.cfg into a folder
+   called /viewer (see SETTINGS below).
+4. Run viewer from the shell.
+
+
+THE LIST
+--------
+Folders come first, then the pictures, in name order. Resting
+on a picture shows it small on the right, with its size.
+
+  Up / Down        move
+  PgUp / PgDn      a page at a time
+  Home / End       top / bottom
+  Enter            open the folder or picture
+  Backspace        up a folder (Left too)
+  s                slide show of the highlighted folder, or of
+                   this folder from the highlighted picture
+  ?                the keys
+  Esc              back to the shell
+
+A folder lists up to 1024 entries.
+
+
+LOOKING AT PICTURES
+-------------------
+  Right, Space     next picture (PgDn too)
+  Left             previous (PgUp and Backspace too)
+  Home / End       first / last
+  Tab              ten ahead
+  r                rotate 90 degrees clockwise
+  + / -            brighter / darker (5 steps; lifts the dark
+                   parts without burning out the light ones)
+  i                a line with the picture's number, name,
+                   size and how long it took to load
+  s                slide show from this picture
+  ? or h           the keys
+  Esc or Enter     back to the list
+
+Next and previous go round from the last picture to the first.
+Photos taken with the camera on its side stand up by themselves
+(the camera's orientation tag). A key pressed while a picture is
+loading takes effect at once: moving keys move, Esc goes back,
+and any other key is ignored.
+
+
+SLIDE SHOWS
+-----------
+s starts one, in the list or while looking at a picture. Each
+picture stays up for 10 seconds (see SETTINGS), and the next one
+loads behind it, so it changes in one go.
+
+  Right            skip to the next one now
+  Left             back to the one before
+  any other key    stop the show (the picture stays up)
+
+A show covers one folder, not the folders inside it, so a folder
+of pictures makes a playlist. Pictures it can't show are passed
+over.
+
+
+SETTINGS
+--------
+/viewer/viewer.cfg, one setting per line, all of them optional.
+# starts a note.
+
+  delay = 10         seconds each picture stays up in a show
+  order = shuffle    shows in a random order, every picture
+                     once before any comes round again
+                     (order = name is the list's order)
+  folder = /pictures/Christmas
+                     the folder the viewer starts in, and
+                     the one autostart shows (/pictures if
+                     this isn't given)
+  autostart = yes    start a slide show of that folder as
+                     soon as the viewer opens: a picture
+                     frame. Any key stops it; Esc then
+                     shows the list.
+  speed = normal     run at 150 MHz (see SPEED)
+
+Anything the viewer doesn't understand is passed over.
+
+
+PICTURES IT SHOWS
+-----------------
+JPEG  baseline JPEGs: what cameras and phones save. Not
+      progressive JPEGs (some web pictures are); it says so.
+PNG   all the usual kinds. Not interlaced or 16-bit PNGs; it
+      says so. See-through parts show as black.
+BMP   uncompressed, 1 to 32 bits.
+
+The list shows files ending .jpg, .jpeg, .jpe, .jfif, .png, .bmp
+and .dib (in capitals or not).
+
+
+SPEED
+-----
+At 250 MHz (the viewer's own setting -- the PicoCalc goes back
+to normal when you leave it), with the PicoCalc's own SD card:
+
+  4000x3000 camera JPEG      2.5 to 3 seconds
+  640x480 PNG                about half a second
+  4096x3072 PNG              about 12 seconds
+  pictures at screen size    a blink
+
+JPEGs load fast because they can be decoded at a half, a
+quarter or an eighth of their size. PNGs can't, so for a big
+picture save it as a JPEG. The last picture looked at, and the
+last three previews, are kept, so going back to them is quick.
+
+250 MHz is more than the RP2350's rated 150 MHz, at a little
+more voltage, as is common. If the viewer ever misbehaves, try
+speed = normal: everything works the same, and big pictures
+take about half as long again to load (a 4000x3000 JPEG
+about 4 seconds).
+
+
+SAMPLES
+-------
+The samples folder has one picture of each kind, credited in
+samples/CREDITS.TXT. The black hole is a NASA/ESA Hubble
+simulation; the photos are the author's.
+
+
+SOURCE
+------
+https://github.com/ctorkildson-netizen/picocalc-viewer (MIT).
+It uses Blair Leduc's picocalc-text-starter drivers, ChaN's
+TJpgDec for JPEG, Larry Bank's PNGdec for PNG, and the picker
+and decoders from picocalc-extras.
+
+Reports and improvements are welcome.
