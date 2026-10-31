@@ -13,10 +13,12 @@ set(MODULES ${CMAKE_CURRENT_LIST_DIR}/modules)
 set(DRV ${MODULES}/picocalc-text-starter/drivers)
 include(${MODULES}/picocalc-extras/picker/picker.cmake)
 include(${MODULES}/picocalc-extras/images/images.cmake)
+include(${MODULES}/picocalc-extras/fatfs/fatfs.cmake)
+picocalc_fatfs(${MODULES}/picocalc-text-starter)	# the SD card, with FatFs
 
 add_executable(viewer
     src/main.c
-    ${DRV}/fat32.c ${DRV}/sdcard.c ${DRV}/font-5x10.c ${DRV}/font-8x10.c
+    ${DRV}/font-5x10.c ${DRV}/font-8x10.c
     ${DRV}/keyboard.c ${DRV}/lcd.c ${DRV}/southbridge.c
 )
 target_include_directories(viewer PRIVATE
@@ -28,7 +30,7 @@ target_compile_definitions(viewer PRIVATE PICO_MALLOC_PANIC=0)
 pico_set_program_name(viewer "viewer")
 pico_enable_stdio_uart(viewer 0)
 pico_enable_stdio_usb(viewer 0)
-target_link_libraries(viewer picocalc_picker picocalc_images
+target_link_libraries(viewer picocalc_picker picocalc_images picocalc_fs
     pico_stdlib hardware_gpio hardware_i2c hardware_spi
     hardware_pio hardware_watchdog hardware_vreg hardware_clocks pico_multicore)
 pico_add_extra_outputs(viewer)

@@ -3,8 +3,7 @@
 	url = https://github.com/ctorkildson-netizen/picocalc-extras.git
 [submodule "modules/picocalc-text-starter"]
 	path = modules/picocalc-text-starter
-	url = https://github.com/ctorkildson-netizen/picocalc-text-starter.git
-	branch = fat32-sequential-read
+	url = https://github.com/BlairLeduc/picocalc-text-starter.git
 [submodule "modules/picocalc-shell"]
 	path = modules/picocalc-shell
 	url = https://github.com/BlairLeduc/picocalc-shell.git

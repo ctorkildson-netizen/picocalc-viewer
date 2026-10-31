@@ -25,8 +25,7 @@ The speed comes from:
 
 - decoding JPEGs at 1/2, 1/4 or 1/8 size when that still fills the screen;
 - converting only the rows of a picture that land on screen;
-- reading the card in 16 KB pieces, with a fix to the FAT32 driver so each
-  read doesn't walk the file's cluster chain from the start (see below);
+- reading the card in 16 KB pieces;
 - running at 250 MHz while the viewer is open (`speed = normal` in
   `/viewer/viewer.cfg` keeps the rated 150 MHz).
 
@@ -61,13 +60,11 @@ of the list (it needs Python, Pillow and the DejaVu fonts).
 
 | Submodule | Pinned to |
 |---|---|
-| [picocalc-extras](https://github.com/ctorkildson-netizen/picocalc-extras) | v1.0 |
-| [picocalc-shell](https://github.com/BlairLeduc/picocalc-shell) (Blair Leduc) | v1.0 |
-| [picocalc-text-starter](https://github.com/BlairLeduc/picocalc-text-starter) (Blair Leduc) | v0.15 plus the FAT32 read fix, from the `fat32-sequential-read` branch of [a fork](https://github.com/ctorkildson-netizen/picocalc-text-starter) |
+| [picocalc-extras](https://github.com/ctorkildson-netizen/picocalc-extras) | v2.1 (the list of files, the picture decoders, and FatFs's build) |
+| [picocalc-shell](https://github.com/BlairLeduc/picocalc-shell) (Blair Leduc) | v1.2 |
+| [picocalc-text-starter](https://github.com/BlairLeduc/picocalc-text-starter) (Blair Leduc) | v0.17 (the screen, keyboard and SD card, with FatFs) |
 
-The read fix has been offered to Blair. When a release of his includes it,
-the submodule goes back to his repo, pinned to that release. Dependabot
-opens a pull request here when a submodule's repo moves on.
+Dependabot opens a pull request here when a submodule's repo moves on.
 
 ## Licence
 

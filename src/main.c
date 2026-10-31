@@ -27,7 +27,7 @@
 #include "drivers/lcd.h"
 #include "drivers/keyboard.h"
 #include "drivers/southbridge.h"
-#include "drivers/fat32.h"
+#include "drivers/filesystem.h"
 #include "drivers/sdcard.h"
 #include "picocalc_shell.h"
 #include "format.h"
@@ -42,14 +42,13 @@ volatile bool user_interrupt;		/* the keyboard driver sets it on Brk */
 
 /* ------------------------------------------------------------ files */
 
-/* Reads go through a 16 KB buffer: the FAT32 driver walks the file's
-   cluster chain from the start on every fat32_read(), so a few big reads
-   are much faster than many small ones. */
+/* Reads go through a 16 KB buffer: the decoders ask for many small
+   pieces, and every read from the card costs time. */
 #define SRC_BUF 16384
 static uint8_t src_buf[SRC_BUF];
 
 struct img_src {
-	fat32_file_t f;
+	FIL f;
 	uint32_t pos, size;		/* where the reader is; the file's size */
 	uint32_t buf_at, buf_len;	/* what src_buf holds */
 };
@@ -57,9 +56,9 @@ struct img_src {
 static bool fill(img_src_t *s)
 {
 	uint32_t at = s->pos;
-	if (fat32_seek(&s->f, at) != FAT32_OK) return false;
-	size_t got = 0;
-	if (fat32_read(&s->f, src_buf, SRC_BUF, &got) != FAT32_OK) return false;
+	if (f_lseek(&s->f, at) != FR_OK) return false;
+	UINT got = 0;
+	if (f_read(&s->f, src_buf, SRC_BUF, &got) != FR_OK) return false;
 	s->buf_at = at;
 	s->buf_len = got;
 	return got > 0;
@@ -237,12 +236,12 @@ static void trim(char *s)
    not understood is passed over, so a mistake never stops the viewer. */
 static void read_settings(void)
 {
-	fat32_file_t f;
-	if (fat32_open(&f, "/viewer/viewer.cfg") != FAT32_OK) return;
+	FIL f;
+	if (f_open(&f, "/viewer/viewer.cfg", FA_READ) != FR_OK) return;
 	static char text[1024];
-	size_t got = 0;
-	if (fat32_read(&f, text, sizeof text - 1, &got) != FAT32_OK) got = 0;
-	fat32_close(&f);
+	UINT got = 0;
+	if (f_read(&f, text, sizeof text - 1, &got) != FR_OK) got = 0;
+	f_close(&f);
 	text[got] = 0;
 	for (char *line = text, *next; line; line = next) {
 		next = strchr(line, '\n');
@@ -276,8 +275,8 @@ static void read_settings(void)
 static const char *load_into(canvas_t *cv, const char *path)
 {
 	img_src_t src = { 0 };
-	if (fat32_open(&src.f, path) != FAT32_OK) return "Can't open this file";
-	src.size = fat32_size(&src.f);
+	if (f_open(&src.f, path, FA_READ) != FR_OK) return "Can't open this file";
+	src.size = (uint32_t)f_size(&src.f);
 	uint8_t head[16];
 	size_t n = src_read(&src, head, sizeof head);
 	const image_format_t *fmt = format_for_head(head, n);
@@ -291,7 +290,7 @@ static const char *load_into(canvas_t *cv, const char *path)
 		/* stand it up, as the camera's orientation tag asks */
 		if (!err) for (int r = cv->rotate; r > 0; r -= 90) canvas_turn(cv);
 	}
-	fat32_close(&src.f);
+	f_close(&src.f);
 	return err;
 }
 
@@ -631,7 +630,7 @@ int main(void)
 {
 	/* The settings first, at the usual 150 MHz, so speed = normal can
 	   keep it there. */
-	fat32_init();
+	fs_init();
 	read_settings();
 	if (cfg.fast) {
 		/* 250 MHz: decoding a big JPEG is mostly arithmetic.  A little
@@ -663,16 +662,14 @@ int main(void)
 
 	/* start in the folder the settings name, else /pictures, else the top */
 	char dir[PICKER_PATH] = "/pictures";
-	fat32_file_t d;
-	if (cfg.folder[0] && fat32_open(&d, cfg.folder) == FAT32_OK) {
-		fat32_close(&d);
+	if (cfg.folder[0] && (!strcmp(cfg.folder, "/") || f_stat(cfg.folder, NULL) == FR_OK))
 		strcpy(dir, cfg.folder);
-	} else if (fat32_open(&d, dir) == FAT32_OK) fat32_close(&d);
-	else strcpy(dir, "/");
+	else if (f_stat(dir, NULL) != FR_OK)
+		strcpy(dir, "/");
 
 	char path[PICKER_PATH];
 	const char *last = NULL;
-	char lastname[FAT32_MAX_FILENAME_LEN + 1];
+	char lastname[FF_MAX_LFN + 1];
 	/* picture frame: straight into a slide show */
 	if (cfg.autostart && picker_load(dir, is_picture) && picker_file_count() > 0) {
 		lcd_clear_screen();
